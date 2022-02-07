@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="RelationsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Documents">
+          <Key>
+            <PropertyRef Name="Document_ID" />
+          </Key>
+          <Property Name="Document_ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Link" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RelatedWords">
+          <Key>
+            <PropertyRef Name="RelatedWords_ID" />
+          </Key>
+          <Property Name="RelatedWords_ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Sentence_FID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="word1" Type="nchar" MaxLength="100" Nullable="false" />
+          <Property Name="word2" Type="nchar" MaxLength="100" Nullable="false" />
+          <Property Name="Count" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Sentences">
+          <Key>
+            <PropertyRef Name="Sentence_ID" />
+          </Key>
+          <Property Name="Sentence_ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Document_FID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Sentence" Type="nvarchar(max)" />
+        </EntityType>
+        <Association Name="FK_RelatedWords_Sentences">
+          <End Role="Sentences" Type="Self.Sentences" Multiplicity="1" />
+          <End Role="RelatedWords" Type="Self.RelatedWords" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Sentences">
+              <PropertyRef Name="Sentence_ID" />
+            </Principal>
+            <Dependent Role="RelatedWords">
+              <PropertyRef Name="Sentence_FID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Sentences_Documents">
+          <End Role="Documents" Type="Self.Documents" Multiplicity="1" />
+          <End Role="Sentences" Type="Self.Sentences" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Documents">
+              <PropertyRef Name="Document_ID" />
+            </Principal>
+            <Dependent Role="Sentences">
+              <PropertyRef Name="Document_FID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="RelationsModelStoreContainer">
+          <EntitySet Name="Documents" EntityType="Self.Documents" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RelatedWords" EntityType="Self.RelatedWords" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Sentences" EntityType="Self.Sentences" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_RelatedWords_Sentences" Association="Self.FK_RelatedWords_Sentences">
+            <End Role="Sentences" EntitySet="Sentences" />
+            <End Role="RelatedWords" EntitySet="RelatedWords" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Sentences_Documents" Association="Self.FK_Sentences_Documents">
+            <End Role="Documents" EntitySet="Documents" />
+            <End Role="Sentences" EntitySet="Sentences" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="RelationsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Documents">
+          <Key>
+            <PropertyRef Name="Document_ID" />
+          </Key>
+          <Property Name="Document_ID" Type="Guid" Nullable="false" />
+          <Property Name="Link" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Sentences" Relationship="Self.FK_Sentences_Documents" FromRole="Documents" ToRole="Sentences" />
+        </EntityType>
+        <EntityType Name="RelatedWords">
+          <Key>
+            <PropertyRef Name="RelatedWords_ID" />
+          </Key>
+          <Property Name="RelatedWords_ID" Type="Guid" Nullable="false" />
+          <Property Name="Sentence_FID" Type="Guid" Nullable="false" />
+          <Property Name="word1" Type="String" MaxLength="100" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="word2" Type="String" MaxLength="100" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="Count" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Sentences" Relationship="Self.FK_RelatedWords_Sentences" FromRole="RelatedWords" ToRole="Sentences" />
+        </EntityType>
+        <EntityType Name="Sentences">
+          <Key>
+            <PropertyRef Name="Sentence_ID" />
+          </Key>
+          <Property Name="Sentence_ID" Type="Guid" Nullable="false" />
+          <Property Name="Document_FID" Type="Guid" Nullable="false" />
+          <NavigationProperty Name="Documents" Relationship="Self.FK_Sentences_Documents" FromRole="Sentences" ToRole="Documents" />
+          <NavigationProperty Name="RelatedWords" Relationship="Self.FK_RelatedWords_Sentences" FromRole="Sentences" ToRole="RelatedWords" />
+          <Property Name="Sentence" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK_Sentences_Documents">
+          <End Role="Documents" Type="Self.Documents" Multiplicity="1" />
+          <End Role="Sentences" Type="Self.Sentences" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Documents">
+              <PropertyRef Name="Document_ID" />
+            </Principal>
+            <Dependent Role="Sentences">
+              <PropertyRef Name="Document_FID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RelatedWords_Sentences">
+          <End Role="Sentences" Type="Self.Sentences" Multiplicity="1" />
+          <End Role="RelatedWords" Type="Self.RelatedWords" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Sentences">
+              <PropertyRef Name="Sentence_ID" />
+            </Principal>
+            <Dependent Role="RelatedWords">
+              <PropertyRef Name="Sentence_FID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="RelationsEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Documents" EntityType="Self.Documents" />
+          <EntitySet Name="RelatedWords" EntityType="Self.RelatedWords" />
+          <EntitySet Name="Sentences" EntityType="Self.Sentences" />
+          <AssociationSet Name="FK_Sentences_Documents" Association="Self.FK_Sentences_Documents">
+            <End Role="Documents" EntitySet="Documents" />
+            <End Role="Sentences" EntitySet="Sentences" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RelatedWords_Sentences" Association="Self.FK_RelatedWords_Sentences">
+            <End Role="Sentences" EntitySet="Sentences" />
+            <End Role="RelatedWords" EntitySet="RelatedWords" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="RelationsModelStoreContainer" CdmEntityContainer="RelationsEntities">
+          <EntitySetMapping Name="Documents">
+            <EntityTypeMapping TypeName="RelationsModel.Documents">
+              <MappingFragment StoreEntitySet="Documents">
+                <ScalarProperty Name="Document_ID" ColumnName="Document_ID" />
+                <ScalarProperty Name="Link" ColumnName="Link" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RelatedWords">
+            <EntityTypeMapping TypeName="RelationsModel.RelatedWords">
+              <MappingFragment StoreEntitySet="RelatedWords">
+                <ScalarProperty Name="RelatedWords_ID" ColumnName="RelatedWords_ID" />
+                <ScalarProperty Name="Sentence_FID" ColumnName="Sentence_FID" />
+                <ScalarProperty Name="word1" ColumnName="word1" />
+                <ScalarProperty Name="word2" ColumnName="word2" />
+                <ScalarProperty Name="Count" ColumnName="Count" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Sentences">
+            <EntityTypeMapping TypeName="RelationsModel.Sentences">
+              <MappingFragment StoreEntitySet="Sentences">
+                <ScalarProperty Name="Sentence" ColumnName="Sentence" />
+                <ScalarProperty Name="Sentence_ID" ColumnName="Sentence_ID" />
+                <ScalarProperty Name="Document_FID" ColumnName="Document_FID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
